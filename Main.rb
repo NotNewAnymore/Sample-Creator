@@ -66,6 +66,11 @@ def displayMagnitude(magnitude)
   end
 end
 
+#Iterate through all arrays in input, add them together, then divide by the number of items in input.
+def combineSounds (input)
+
+end
+
 if __FILE__ == $0
   continue = false
   sounds = []
@@ -75,19 +80,19 @@ if __FILE__ == $0
 1: Square Wave\n
 2: Tan wave"
     ui = gets().chomp
-    if ui == "0"
+    if ui == "0"  #Sine wave
       puts "What tone multiplier do you want?"
       $waveLengthMult = gets.to_f()
       puts "How much noise do you want?"
       data = sineWave(data, gets.to_i())
       puts "Generated a sine wave"
-    elsif ui == "1"
+    elsif ui == "1" #Square wave
       puts "What tone multiplier do you want?"
       $waveLengthMult = gets.to_f()
       puts "How much noise do you want?"
       data = squareWave(data, gets.to_i())
       puts "Generated a square wave"
-    elsif ui == "2"
+    elsif ui == "2" #Tan wave
       puts "What tone multiplier do you want?"
       $waveLengthMult = gets.to_f()
       puts "How much noise do you want?"
