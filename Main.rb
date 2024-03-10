@@ -1,9 +1,10 @@
-require('colorize')
+require("colorize")
 $position = 0
 $magnitude = 0
 data = ""
 $rate = 44100
 $waveLengthMult = 1
+
 def sineWave(data, noise)
   ($rate).times {
     $position += $waveLengthMult
@@ -41,6 +42,7 @@ def tanWave(data, noise)
   }
   data
 end
+
 #Display magnitude of current position.
 def displayMagnitude(magnitude)
   m = magnitude
@@ -64,30 +66,41 @@ def displayMagnitude(magnitude)
   end
 end
 
-puts "What do you want to generate?\n
+if __FILE__ == $0
+  continue = false
+  sounds = []
+  while continue == false
+    puts "What do you want to generate?\n
 0: Sine wave\n
 1: Square Wave\n
 2: Tan wave"
-ui = gets().chomp
-if ui == "0"
-  puts "What tone multiplier do you want?"
-  $waveLengthMult = gets.to_f()
-  puts "How much noise do you want?"
-  data = sineWave(data, gets.to_i())
-  puts "Generated a sine wave"
-elsif ui == "1"
-  puts "What tone multiplier do you want?"
-  $waveLengthMult = gets.to_f()
-  puts "How much noise do you want?"
-  data = squareWave(data, gets.to_i())
-  puts "Generated a square wave"
-elsif ui == "2"
-  puts "What tone multiplier do you want?"
-  $waveLengthMult = gets.to_f()
-  puts "How much noise do you want?"
-  data = tanWave(data, gets.to_i())
-  puts "Generated a tan wave"
-end
+    ui = gets().chomp
+    if ui == "0"
+      puts "What tone multiplier do you want?"
+      $waveLengthMult = gets.to_f()
+      puts "How much noise do you want?"
+      data = sineWave(data, gets.to_i())
+      puts "Generated a sine wave"
+    elsif ui == "1"
+      puts "What tone multiplier do you want?"
+      $waveLengthMult = gets.to_f()
+      puts "How much noise do you want?"
+      data = squareWave(data, gets.to_i())
+      puts "Generated a square wave"
+    elsif ui == "2"
+      puts "What tone multiplier do you want?"
+      $waveLengthMult = gets.to_f()
+      puts "How much noise do you want?"
+      data = tanWave(data, gets.to_i())
+      puts "Generated a tan wave"
+    end
+    sounds << data
+    puts "1: Combine sounds \n2: Add another sound"
+    if (gets().chomp == "1")
+      continue = true
+    end
+  end
 
-puts "Import as unsigned 8-bit PCM"
-File.write("Sample", data)
+  puts "Import as unsigned 8-bit PCM"
+  File.write("Sample", data)
+end
