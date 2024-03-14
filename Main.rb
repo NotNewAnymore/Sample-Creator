@@ -1,4 +1,6 @@
 require("colorize") #External library for printing to console in color.
+require("fox16") #GUI library, intended to provide very efficent, cross-platform, and easy to use UI.
+include Fox
 $position = 0
 $magnitude = 0
 data = ""
@@ -89,6 +91,7 @@ def combineSounds(input)
 end
 
 if __FILE__ == $0
+  application = FXApp.new("Sound Generator","Henry")
   continue = false
   sounds = []
   while continue == false
@@ -98,10 +101,15 @@ if __FILE__ == $0
 2: Tan wave"
     ui = gets().chomp
     if ui == "0" #Sine wave
-      puts "What tone multiplier do you want?"
-      $waveLengthMult = gets.to_f()
-      puts "How much noise do you want?"
-      data = sineWave("", gets.to_i())
+      # puts "What tone multiplier do you want?"
+      # $waveLengthMult = gets.to_f()
+      # puts "How much noise do you want?"
+      # data = sineWave("", gets.to_i())
+      main = FXMainWindow.new(application, "Hello")
+      #FXButton.new(main, "&Hello, World!", nil, application, FXApp::ID_QUIT)
+      application.create()
+      main.show(PLACEMENT_SCREEN)
+      application.run()
       puts "Generated a sine wave"
     elsif ui == "1" #Square wave
       puts "What tone multiplier do you want?"
