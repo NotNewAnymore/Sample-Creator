@@ -3,6 +3,7 @@ require("fox16") #GUI library, intended to provide very efficent, cross-platform
 include Fox
 $position = 0
 $magnitude = 0
+$noise
 data = ""
 $rate = 44100
 $waveLengthMult = 1
@@ -69,29 +70,29 @@ end
 #Iterate through all arrays in input, add them together, then divide by the number of items in input.
 def combineSounds(input)
   datHolder = []
-  input.each { |x|  #Outer loop, iterates through the sound container
-    x.length.times { |i|  #Inner loop, iterates through the sound
-      if datHolder[i].nil?    #If the spot is empty, set it to the value of the current tone
+  input.each { |x| #Outer loop, iterates through the sound container
+    x.length.times { |i| #Inner loop, iterates through the sound
+      if datHolder[i].nil? #If the spot is empty, set it to the value of the current tone
         datHolder[i] = x[i].ord
-      else                    #If the spot is not empty, add the current sound to the previous sound
+      else #If the spot is not empty, add the current sound to the previous sound
         datHolder[i] += x[i].ord
       end
     }
   }
-  datHolder.length.times{|i|  #Divide everything by the number of sounds, to finish averaging it.
+  datHolder.length.times { |i| #Divide everything by the number of sounds, to finish averaging it.
     datHolder[i] /= input.count
     datHolder[i] = datHolder[i].chr
-    }
+  }
   datout = ""
-  datHolder.each{|x|  #Display sounds in visualizer
-                 datout += x
-                displayMagnitude(x.ord)
-    }
+  datHolder.each { |x| #Display sounds in visualizer
+    datout += x
+    displayMagnitude(x.ord)
+  }
   datout              #Return combined sounds
 end
 
 if __FILE__ == $0
-  application = FXApp.new("Sound Generator","Henry")
+  application = FXApp.new("Sound Generator", "Henry")
   continue = false
   sounds = []
   while continue == false
@@ -106,10 +107,19 @@ if __FILE__ == $0
       # puts "How much noise do you want?"
       # data = sineWave("", gets.to_i())
       main = FXMainWindow.new(application, "Hello")
-      #FXButton.new(main, "&Hello, World!", nil, application, FXApp::ID_QUIT)
+      FXLabel.new(main, "Wavelength Multiplier: float, 0-infinite")
+      waveLengthEntry = FXTextField.new(main, 15)
+      enterButton = FXButton.new(main, "Enter", nil, application)
+      enterButton.connect(SEL_COMMAND) do
+        puts "The button works!"
+        $waveLengthMult = waveLengthEntry.text.chomp.to_f
+        $noise = 0
+      end
+      FXButton.new(main, "Continue", nil, application, FXApp::ID_QUIT)
       application.create()
       main.show(PLACEMENT_SCREEN)
       application.run()
+      data = sineWave("", 0)
       puts "Generated a sine wave"
     elsif ui == "1" #Square wave
       puts "What tone multiplier do you want?"
