@@ -8,6 +8,7 @@ data = ""
 $rate = 44100
 $waveLengthMult = 1
 $continue = false
+$SquarePulseWidth = 110
 
 def sineWave(data, noise)
   ($rate).times {
@@ -23,7 +24,7 @@ end
 def squareWave(data, noise)
   ($rate).times {
     $position += $waveLengthMult
-    if ($position % (240) < 110)
+    if ($position % (240) < $SquarePulseWidth)
       $magnitude = 255
     else
       $magnitude = 0
@@ -93,6 +94,7 @@ def combineSounds(input)
 end
 
 if __FILE__ == $0
+  #Set up GUI
   Thread.new {
     application = FXApp.new("Sound Generator", "Henry")
     mainWindow = FXMainWindow.new(application, "Waveform Settings")
@@ -102,11 +104,14 @@ if __FILE__ == $0
     waveLengthEntry = FXTextField.new(universalSettings, 15); waveLengthEntry.text = "1"
     FXLabel.new(universalSettings, "Noise: float, 0-infinite")                           #Noise
     noiseEntry = FXTextField.new(universalSettings, 15); noiseEntry.text = "15"
+    FXLabel.new(mainWindow, "Pulse width, int,  0-220")                                   #Pulse Width
+    pulseWidthEntry =  FXTextField.new(mainWindow, 15); pulseWidthEntry.text = "110"
     enterButton = FXButton.new(mainWindow, "Enter", nil, application)
     enterButton.connect(SEL_COMMAND) do
-      puts "The button works!"
+      puts "Applied Settings!"
       $waveLengthMult = waveLengthEntry.text.chomp.to_f
       $noise = noiseEntry.text.chomp.to_f
+      $SquarePulseWidth = pulseWidthEntry.text.chomp.to_f
     end
     application.create()
     mainWindow.show(PLACEMENT_SCREEN)
