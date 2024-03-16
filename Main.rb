@@ -7,6 +7,7 @@ $noise
 data = ""
 $rate = 44100
 $waveLengthMult = 1
+$continue = false
 
 def sineWave(data, noise)
   ($rate).times {
@@ -92,40 +93,48 @@ def combineSounds(input)
 end
 
 if __FILE__ == $0
-  application = FXApp.new("Sound Generator", "Henry")
-  continue = false
+  Thread.new {
+    application = FXApp.new("Sound Generator", "Henry")
+    mainWindow = FXMainWindow.new(application, "Waveform Settings")
+
+    universalSettings = FXGroupBox.new(mainWindow,"Universal Settings",opts = GROUPBOX_NORMAL)
+    FXLabel.new(universalSettings, "Wavelength Multiplier: float, 0-infinite")           #Wavelength
+    waveLengthEntry = FXTextField.new(universalSettings, 15); waveLengthEntry.text = "1"
+    FXLabel.new(universalSettings, "Noise: float, 0-infinite")                           #Noise
+    noiseEntry = FXTextField.new(universalSettings, 15); noiseEntry.text = "15"
+    enterButton = FXButton.new(mainWindow, "Enter", nil, application)
+    enterButton.connect(SEL_COMMAND) do
+      puts "The button works!"
+      $waveLengthMult = waveLengthEntry.text.chomp.to_f
+      $noise = noiseEntry.text.chomp.to_f
+    end
+    application.create()
+    mainWindow.show(PLACEMENT_SCREEN)
+    application.run()
+    application.destroy
+
+  }
   sounds = []
+  continue = false
   while continue == false
     puts "What do you want to generate?\n
 0: Sine wave\n
 1: Square Wave\n
 2: Tan wave"
     ui = gets().chomp
+
     if ui == "0" #Sine wave
       # puts "What tone multiplier do you want?"
       # $waveLengthMult = gets.to_f()
       # puts "How much noise do you want?"
       # data = sineWave("", gets.to_i())
-      main = FXMainWindow.new(application, "Hello")
-      FXLabel.new(main, "Wavelength Multiplier: float, 0-infinite")
-      waveLengthEntry = FXTextField.new(main, 15)
-      enterButton = FXButton.new(main, "Enter", nil, application)
-      enterButton.connect(SEL_COMMAND) do
-        puts "The button works!"
-        $waveLengthMult = waveLengthEntry.text.chomp.to_f
-        $noise = 0
-      end
-      FXButton.new(main, "Continue", nil, application, FXApp::ID_QUIT)
-      application.create()
-      main.show(PLACEMENT_SCREEN)
-      application.run()
-      data = sineWave("", 0)
+      data = sineWave("", $noise)
       puts "Generated a sine wave"
     elsif ui == "1" #Square wave
-      puts "What tone multiplier do you want?"
-      $waveLengthMult = gets.to_f()
-      puts "How much noise do you want?"
-      data = squareWave("", gets.to_i())
+      # puts "What tone multiplier do you want?"
+      # $waveLengthMult = gets.to_f()
+      # puts "How much noise do you want?"
+      data = squareWave("", $noise)
       puts "Generated a square wave"
     elsif ui == "2" #Tan wave
       puts "What tone multiplier do you want?"
