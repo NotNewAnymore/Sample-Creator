@@ -12,6 +12,7 @@ $SquarePulseWidth = 110
 $offset = 0
 
 def sineWave(data, noise)
+    $position = $offset
   ($rate).times {
     $position += $waveLengthMult
     $magnitude = (Math.sin(($position + Random.rand(0..noise)) * 0.02 + 1) + 1) * 127 #Run-on sentance but in code. Figures out the current magnitude from the position, noise, and a pile of constants.
@@ -23,6 +24,7 @@ def sineWave(data, noise)
 end
 
 def squareWave(data, noise)
+    $position = $offset
   ($rate).times {
     $position += $waveLengthMult
     if ($position % (240) < $SquarePulseWidth)
@@ -37,6 +39,7 @@ def squareWave(data, noise)
 end
 
 def tanWave(data, noise)
+    $position = $offset
   ($rate).times {
     $position += $waveLengthMult
     $magnitude = (Math.tan(($position + Random.rand(0..noise)) * 0.02 + 1) + 1) * 127
@@ -48,6 +51,7 @@ def tanWave(data, noise)
 end
 
 def pwmSquareWave(data, otherWave)
+    $position = $offset
   sPos = 0
   ($rate).times {
     $position += $waveLengthMult
@@ -64,6 +68,7 @@ def pwmSquareWave(data, otherWave)
 end
 
 def fmSineWave(data, otherwave)
+    $position = $offset
     otherWavePositon = 0
     ($rate).times {
     $position += otherwave[otherWavePositon].ord * 0.01 * $waveLengthMult
@@ -146,6 +151,9 @@ if __FILE__ == $0
     noiseEntry = FXTextField.new(universalSettings, 15); noiseEntry.text = "15"
     FXLabel.new(mainWindow, "Pulse width, int,  0-220")                                   #Pulse Width
     pulseWidthEntry = FXTextField.new(mainWindow, 15); pulseWidthEntry.text = "110"
+    FXLabel.new(mainWindow,"Offset, float, 0-infinite")
+    offsetEntry = FXTextField.new(mainWindow, 15); offsetEntry.text = "0"               #Offset
+
     printButton = FXButton.new(mainWindow, "Print waves", nil, application)
     printButton.connect(SEL_COMMAND) do
       outerIteration = 0
@@ -167,6 +175,7 @@ if __FILE__ == $0
       $waveLengthMult = waveLengthEntry.text.chomp.to_f
       $noise = noiseEntry.text.chomp.to_f
       $SquarePulseWidth = pulseWidthEntry.text.chomp.to_f
+      $offset = offsetEntry.text.chomp.to_f
     end
     application.create()
     mainWindow.show(PLACEMENT_SCREEN)
