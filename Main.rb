@@ -3,12 +3,13 @@ require("fox16") #GUI library, intended to provide very efficent, cross-platform
 include Fox
 $position = 0
 $magnitude = 0
-$noise
+$noise = 15
 data = ""
 $rate = 44100
 $waveLengthMult = 1
 $continue = false
 $SquarePulseWidth = 110
+$offset = 0
 
 def sineWave(data, noise)
   ($rate).times {
@@ -46,6 +47,43 @@ def tanWave(data, noise)
   data
 end
 
+def pwmSquareWave(data, otherWave)
+  sPos = 0
+  ($rate).times {
+    $position += $waveLengthMult
+    if ($position % (240) < otherWave[sPos].ord * 0.9)
+      $magnitude = 255
+    else
+      $magnitude = 0
+    end
+    displayMagnitude $magnitude
+    data += $magnitude.chr()
+    sPos += 1
+  }
+  data
+end
+
+def fmSineWave(data, otherwave)
+    otherWavePositon = 0
+    ($rate).times {
+    $position += otherwave[otherWavePositon].ord * 0.01 * $waveLengthMult
+    otherWavePositon += 1
+    $magnitude = (Math.sin(($position + Random.rand(0..$noise)) * 0.02 + 1) + 1) * 127 #Run-on sentance but in code. Figures out the current magnitude from the position, noise, and a pile of constants.
+    $magnitude = $magnitude.round #Turn the magnitude into an int so it can be saved as a char
+    displayMagnitude $magnitude
+    data += $magnitude.chr()
+  }
+  data
+end
+
+def volumeAdjust(data, volume)
+  i = 0
+  data.length.times{
+    data[i].chr = (data[i].ord * volume) % 255
+    i += 1
+    }
+  data
+end
 #Display magnitude of current position.
 def displayMagnitude(magnitude)
   m = magnitude
@@ -94,18 +132,35 @@ def combineSounds(input)
 end
 
 if __FILE__ == $0
-  #Set up GUI
+  sounds = []
+  continue = false
+  #Set up GUI =======================================================================================================
   Thread.new {
     application = FXApp.new("Sound Generator", "Henry")
     mainWindow = FXMainWindow.new(application, "Waveform Settings")
 
-    universalSettings = FXGroupBox.new(mainWindow,"Universal Settings",opts = GROUPBOX_NORMAL)
+    universalSettings = FXGroupBox.new(mainWindow, "Universal Settings", opts = GROUPBOX_NORMAL)
     FXLabel.new(universalSettings, "Wavelength Multiplier: float, 0-infinite")           #Wavelength
     waveLengthEntry = FXTextField.new(universalSettings, 15); waveLengthEntry.text = "1"
     FXLabel.new(universalSettings, "Noise: float, 0-infinite")                           #Noise
     noiseEntry = FXTextField.new(universalSettings, 15); noiseEntry.text = "15"
     FXLabel.new(mainWindow, "Pulse width, int,  0-220")                                   #Pulse Width
-    pulseWidthEntry =  FXTextField.new(mainWindow, 15); pulseWidthEntry.text = "110"
+    pulseWidthEntry = FXTextField.new(mainWindow, 15); pulseWidthEntry.text = "110"
+    printButton = FXButton.new(mainWindow, "Print waves", nil, application)
+    printButton.connect(SEL_COMMAND) do
+      outerIteration = 0
+      sounds.each() { |n|
+        iteration = 0
+        print "\n#{outerIteration}:"
+        160.times {
+          displayMagnitude(n[iteration].ord)
+
+          iteration += 1
+        }
+        outerIteration += 1
+      }
+    end
+
     enterButton = FXButton.new(mainWindow, "Enter", nil, application)
     enterButton.connect(SEL_COMMAND) do
       puts "Applied Settings!"
@@ -117,15 +172,17 @@ if __FILE__ == $0
     mainWindow.show(PLACEMENT_SCREEN)
     application.run()
     application.destroy
-
   }
-  sounds = []
-  continue = false
+   #Main loop ==================================================================================================================
   while continue == false
     puts "What do you want to generate?\n
-0: Sine wave\n
-1: Square Wave\n
-2: Tan wave"
+0: Sine wave
+1: Square Wave
+2: Tan wave
+3: PWM (modifies but does not overwrite existing wave!!!)
+4: Delete a wave
+5: Adjust volume of a wave(NOT IMPLEMENTED)
+6: FM Synthesis"
     ui = gets().chomp
 
     if ui == "0" #Sine wave
@@ -134,27 +191,57 @@ if __FILE__ == $0
       # puts "How much noise do you want?"
       # data = sineWave("", gets.to_i())
       data = sineWave("", $noise)
+      sounds << data
       puts "Generated a sine wave"
     elsif ui == "1" #Square wave
       # puts "What tone multiplier do you want?"
       # $waveLengthMult = gets.to_f()
       # puts "How much noise do you want?"
       data = squareWave("", $noise)
+      sounds << data
       puts "Generated a square wave"
     elsif ui == "2" #Tan wave
-      puts "What tone multiplier do you want?"
-      $waveLengthMult = gets.to_f()
-      puts "How much noise do you want?"
-      data = tanWave("", gets.to_i())
+      data = tanWave("", $noise)
+      sounds << data
       puts "Generated a tan wave"
+    elsif ui == "3" #PWM
+      puts "Which wave to you want to use?"
+      ui = gets.chomp.to_i
+      data = pwmSquareWave("", sounds[ui])
+      sounds << data
+      puts "Created PWM from #{ui}!"
+    elsif ui == "4" #Delete wave
+      puts "Which wave do you want to delete?"
+      sounds.delete_at(gets.chomp.to_i)
+    elsif ui == "5"  #Volume
+      puts "Which wave to you want to adjust?"
+      ui = gets.chomp.to_i()
+      puts "what volume do you want?"
+      vol = gets.chomp.to_f()
+      data = sounds[ui]
+      sounds[ui] = volumeAdjust(data, vol)
+    elsif ui == "6" #FM Synthesis
+      puts "Which wave to you want to use?"
+      ui = gets.chomp.to_i
+      data = fmSineWave("", sounds[ui])
+      sounds << data
+      puts "Created FM Syntesis from #{ui}!"
     end
-    sounds << data
-    puts "1: Combine sounds \n2: Add another sound"
-    if (gets().chomp == "1")
-      continue = true
+
+    puts "1: Combine all sounds and save \n
+    2: Add or remove sound\n
+    3: Save a specific sound"
+    ui = gets().chomp
+    if (ui == "1") #Combine all sounds and save
+      data = combineSounds(sounds)
+      puts "Import as unsigned 8-bit PCM"
+      File.write("Sample", data)
+      exit
+    elsif (ui == "3")
+      puts "What sound do you want to save?"
+      data = sounds[gets.chomp.to_i]
+      puts "Import as unsigned 8-bit PCM"
+      File.write("Sample", data)
     end
   end
-  data = combineSounds(sounds)
-  puts "Import as unsigned 8-bit PCM"
-  File.write("Sample", data)
 end

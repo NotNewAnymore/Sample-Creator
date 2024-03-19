@@ -9,3 +9,4 @@ Implemented a basic UI today. For some reason, closing the window does not close
 Added noise setting to UI, but it does not work.
 Froze windowing server by updating a window in a different thread with an infinite loop! Learned how to kill ruby from the command line, looked it up using Lynx, found what the process id was using pgrep, killed it using kill. After that, window decorations stopped showing up, and the video desktop background was flickering a bit.
 Changed UI to avoid previous issues. Now opens one window at the start, and keeps it open. It's less intuitive, but I don't have time to make it better. Next up: Pulse Width settings!
+Implemented pulse width setting for square wave, and a wave index display so the user knows which wave is in which slot.
