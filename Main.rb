@@ -84,7 +84,8 @@ end
 def volumeAdjust(data, volume)
   i = 0
   data.length.times{
-    data[i].chr = (data[i].ord * volume) % 255
+    data[i] = ((data[i].ord * volume) % 255).to_i.chr
+    displayMagnitude data[i].ord
     i += 1
     }
   data
@@ -188,9 +189,9 @@ if __FILE__ == $0
 0: Sine wave
 1: Square Wave
 2: Tan wave
-3: PWM (modifies but does not overwrite existing wave!!!)
+3: Pulse Width Modulation
 4: Delete a wave
-5: Adjust volume of a wave(NOT IMPLEMENTED)
+5: Adjust volume of a wave
 6: FM Synthesis"
     ui = gets().chomp
 
