@@ -238,9 +238,9 @@ if __FILE__ == $0
       puts "Created FM Syntesis from #{ui}!"
     end
 
-    puts "1: Combine all sounds and save \n
-    2: Add or remove sound\n
-    3: Save a specific sound"
+    puts "1: Combine all sounds and save
+2: Add or remove sound
+3: Save a specific sound"
     ui = gets().chomp
     if (ui == "1") #Combine all sounds and save
       data = combineSounds(sounds)
