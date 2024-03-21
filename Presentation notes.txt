@@ -1,0 +1,10 @@
+ Tech stack:
+ Language: Ruby, main branch
+ Gems: Colorize for wave display, FXRuby for control panel
+ External software: Audacity, for conversion to .MP3 file format
+
+ Reasoning behind project's creation: Both of my siblings are musicians, my sister is a composer & producer, and my brother was in the high school band for years. I wanted to do something musical, but I don't really understand music theory. So I decided to make a synthesizer. I started with a few wave generators, which were very similar to enemy "AI" I made for a SHMUP for a previous final. After that, I decided to make this my final project for this term, so I had to do something ambitious, but I had just hurt my back by lifting something heavy (again), so I couldn't code for very long at a time. I talked with my sister, who mentioned FM Synthesis, which I had heard of but did not understand, and so she gave me a quick explanation from the perspective of a musician that uses it. I then implemetned Pulse Width Modulation and FM Synthesis with barely any additional research.
+
+ A big problem I had with this when it transitioned to being a school project was the UI. The entirely text-based interface was not going to cut it, so I decided to make a GUI using FXRuby. Unfortunately, I don't understand FXRuby, and was having issues when using it to make a pop-up menu for each option. Eventually I tried putting it in a new thread, and the window would not update properly, so I had a second thread tell it to update as often as possible. This froze my desktop environment and windowing system. I was able to unfreeze it by using Pgrep to look up Ruby's process ID, and Kill to stop it from running.
+
+ Potential improvements: Better UI, attack/release, volume from waveform, add sounds together without closing and saving.
